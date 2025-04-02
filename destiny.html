@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Destino de Destiny</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #background {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        #dialogue-box {
+            position: absolute;
+            bottom: 10%;
+            left: 10%;
+            width: 80%;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: left;
+        }
+        #options {
+            margin-top: 10px;
+        }
+        .option-button {
+            background: cyan;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #start-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            padding: 15px 30px;
+            background: red;
+            color: white;
+            font-size: 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <img id="background" src="https://i.ibb.co/DH8Ryhzb/IMG-20250401-135113-522.jpg" alt="Fondo del juego">
+    <div id="dialogue-box">
+        <p id="dialogue-text">Haz clic en "Iniciar" para comenzar la historia.</p>
+        <div id="options"></div>
+    </div>
+    <button id="start-button">Iniciar</button>
+</div>
+
+<audio id="bg-music" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+    const dialogueText = document.getElementById("dialogue-text");
+    const optionsDiv = document.getElementById("options");
+    const background = document.getElementById("background");
+    const bgMusic = document.getElementById("bg-music");
+    const startButton = document.getElementById("start-button");
+
+    let currentScene = 0;
+    let storyData;
+
+    // Cargar los datos del archivo JSON
+    fetch('dialogues.json')
+        .then(response => response.json())
+        .then(data => {
+            storyData = data;
+            startButton.onclick = () => {
+                bgMusic.play().catch(() => console.log("El usuario debe interactuar para iniciar la música."));
+                startButton.style.display = "none";
+                showScene(0);
+            };
+        });
+
+    // Mostrar escena
+    function showScene(sceneIndex) {
+        const scene = storyData.scenes[sceneIndex];
+        dialogueText.textContent = scene.text;
+        background.src = scene.bg;
+        optionsDiv.innerHTML = "";
+
+        if (scene.options) {
+            scene.options.forEach(option => {
+                const button = document.createElement("button");
+                button.textContent = option.text;
+                button.classList.add("option-button");
+                button.onclick = () => loadText(option.file, sceneIndex);
+                optionsDiv.appendChild(button);
+            });
+        } else {
+            setTimeout(() => showScene(sceneIndex + 1), 2000);
+        }
+    }
+
+    // Cargar texto desde archivo
+    function loadText(file, sceneIndex) {
+        fetch(file)
+            .then(response => response.text())
+            .then(text => {
+                dialogueText.textContent = text;
+                // Si hay una escena posterior, cargarla
+                setTimeout(() => {
+                    if (sceneIndex + 1 < storyData.scenes.length) {
+                        showScene(sceneIndex + 1);
+                    }
+                }, 2000);
+            });
+    }
+</script>
+
+</body>
+</html>

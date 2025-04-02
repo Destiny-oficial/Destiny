@@ -1,0 +1,38 @@
+{
+  "scenes": [
+    {
+      "text": "Destiny está en su cuarto viendo anime y jugando.",
+      "bg": "https://i.ibb.co/DH8Ryhzb/IMG-20250401-135113-522.jpg"
+    },
+    {
+      "text": "De repente suena su madre llamándola a cenar.",
+      "bg": "https://postimage.me/images/2025/02/17/1739741081602.jpg"
+    },
+    {
+      "text": "¿Bajarás a cenar o seguirás jugando?",
+      "bg": "https://qu.ax/JrOvP.jpg",
+      "options": [
+        {
+          "text": "Bajar a cenar",
+          "file": "bajar_a_cenar.txt"
+        },
+        {
+          "text": "Seguir jugando",
+          "file": "seguir_jugando.txt"
+        }
+      ]
+    },
+    {
+  "scenes": [
+    {
+      "text": "Al día siguiente, Destiny se despierta con una extraña sensación."
+      "bg": "https://postimage.me/images/2025/02/17/1739741081602.jpg"},
+      
+      "options": [
+        { "text": "Bajar a buscar a sus padres", "file": "buscar_papas.txt" },
+        { "text": "Mirar el teléfono", "file": "mirar_telefono.txt" }
+      ]
+    }
+  ]
+  ]
+}
