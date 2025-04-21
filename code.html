@@ -1,0 +1,73 @@
+<!DOCTYPE html><html>
+<head>
+  <title>Panel de Códigos - Admin</title>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: Arial;
+      padding: 30px;
+    }
+    input, select, button {
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      border-radius: 5px;
+      border: none;
+    }
+    button {
+      background-color: #00b894;
+      color: white;
+      cursor: pointer;
+    }
+    .form-container {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      margin: auto;
+    }
+  </style>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+</head>
+<body>
+  <h2>Panel de Códigos</h2>
+  <div class="form-container">
+    <input type="text" id="code" placeholder="Código (ej: trajeazul)" />
+    <select id="type">
+      <option value="traje">Traje</option>
+      <option value="monedas">Monedas</option>
+    </select>
+    <input type="text" id="itemOrAmount" placeholder="Nombre del traje o cantidad de monedas" />
+    <button onclick="addCode()">Agregar código</button>
+  </div>  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyA7azs1zx0HSKIweklLqtH78bKW5pzilKs",
+      authDomain: "destiny-game-5e8f9.firebaseapp.com",
+      projectId: "destiny-game-5e8f9"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    function addCode() {
+      const code = document.getElementById("code").value.trim().toLowerCase();
+      const type = document.getElementById("type").value;
+      const value = document.getElementById("itemOrAmount").value.trim();
+
+      if (!code || !value) {
+        alert("Por favor completa todos los campos.");
+        return;
+      }
+<a href=""></a>
+      const data = { type, usedBy: [] };
+      if (type === "traje") data.item = value;
+      else data.amount = parseInt(value);
+
+      db.collection("codes").doc(code).set(data)
+        .then(() => alert("Código agregado correctamente."))
+        .catch(err => alert("Error: " + err.message));
+    }
+  </script></body>
+</html>
