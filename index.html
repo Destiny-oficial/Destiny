@@ -563,11 +563,11 @@ function redeemCode() {
       coins += data.value;
       document.getElementById("coins").innerText = coins;
       saveProgress();
-      alert(`¡Has recibido ${data.value} monedas!`);
+      alert(`¡Has recibido ${data.item} monedas!`);
     } else if (data.type === "traje") {
-      if (!ownedSkins.includes(data.value)) {
-        ownedSkins.push(data.value);
-        alert(`¡Has desbloqueado el traje: ${data.value}!`);
+      if (!ownedOutfits.includes(data.item)) {
+        ownedOutfits.push(data.item);
+        alert(`¡Has desbloqueado el traje: ${data.item}!`);
       } else {
         alert("Ya tienes este traje.");
         return;
