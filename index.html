@@ -138,6 +138,17 @@
   <button onclick="redeemCode()" style="padding: 6px 10px;">Canjear</button>
 </div>
 
+<!-- Botón de correos -->
+<button onclick="cargarCorreos()" style="position:absolute; top:10px; right:320px;">Correo</button>
+
+<!-- Panel de correos -->
+<div id="correoPanel" style="display:none; position:absolute; top:15%; left:50%; transform:translateX(-50%); background:#111; color:white; padding:20px; border-radius:10px; z-index:5; width:90%; max-width:600px;">
+  <h3>Bandeja de Entrada</h3>
+  <div id="correoLista"></div>
+  <br>
+  <button onclick="document.getElementById('correoPanel').style.display='none'">Cerrar</button>
+</div>
+
   <div id="store">
   <div><button onclick="buy('Laptop Gamer', 100)">Laptop Gamer (100)</button></div>
   <div><button onclick="buy('Monitor Curvo', 150)">Monitor Curvo (150)</button></div>
@@ -559,11 +570,11 @@ function redeemCode() {
     }
 
     // Premiar según el tipo
-    if (data.type === "coins") {
-      coins += data.value;
+    if (data.type === "monedas" || data.type === "coins") {
+      coins += data.amount;
       document.getElementById("coins").innerText = coins;
       saveProgress();
-      alert(`¡Has recibido ${data.item} monedas!`);
+      alert(`¡Has recibido ${data.amount} monedas!`);
     } else if (data.type === "traje") {
       if (!ownedOutfits.includes(data.item)) {
         ownedOutfits.push(data.item);
@@ -695,6 +706,74 @@ function showOutfitSelector() {
     container.appendChild(img);
   });
   document.getElementById("outfitSelector").style.display = "block";
+}
+
+function cargarCorreos() {
+  if (!userId) return;
+
+  const contenedor = document.getElementById("correoLista");
+  contenedor.innerHTML = "Cargando correos...";
+
+  db.collection("correos")
+    .where("para", "in", ["todos", userId])
+    .orderBy("fecha", "desc")
+    .get()
+    .then(snapshot => {
+      contenedor.innerHTML = "";
+      if (snapshot.empty) {
+        contenedor.innerHTML = "<p>No tienes correos nuevos.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const yaReclamado = data.reclamadoPor && data.reclamadoPor.includes(userId);
+
+        const div = document.createElement("div");
+        div.style.border = "1px solid white";
+        div.style.padding = "10px";
+        div.style.marginBottom = "10px";
+        div.innerHTML = `<strong>${data.asunto}</strong><br>${data.mensaje}<br><small>${new Date(data.fecha).toLocaleString()}</small>`;
+
+        if (!yaReclamado && data.recompensa) {
+          const btn = document.createElement("button");
+          btn.innerText = "Reclamar";
+          btn.onclick = () => {
+            if (data.recompensa.monedas) {
+              coins += data.recompensa.monedas;
+              document.getElementById("coins").innerText = coins;
+              alert(`Recibiste ${data.recompensa.monedas} monedas`);
+            }
+
+            if (data.recompensa.traje) {
+              if (!ownedOutfits.includes(data.recompensa.traje)) {
+                ownedOutfits.push(data.recompensa.traje);
+                alert(`¡Traje desbloqueado: ${data.recompensa.traje}!`);
+              } else {
+                alert("Ya tenías este traje.");
+              }
+            }
+
+            saveProgress();
+
+            db.collection("correos").doc(doc.id).update({
+              reclamadoPor: firebase.firestore.FieldValue.arrayUnion(userId)
+            });
+
+            btn.disabled = true;
+            btn.innerText = "Reclamado";
+          };
+          div.appendChild(document.createElement("br"));
+          div.appendChild(btn);
+        } else if (yaReclamado) {
+          div.innerHTML += "<br><em style='color:lightgreen;'>Recompensa reclamada</em>";
+        }
+
+        contenedor.appendChild(div);
+      });
+
+      document.getElementById("correoPanel").style.display = "block";
+    });
 }
 
   </script>
